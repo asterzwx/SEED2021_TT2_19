@@ -45,68 +45,131 @@ app.use('/api/transfer', (req, res) =>{
     .then(function (response) {
       console.log(JSON.stringify(response.data));
       //res.json(response.data)
-      res.json(req.body);
+      //res.json(req.body);
 
-    
       //Here means transfer was success, so update both accounts
-      //Update Sender's balance
-      //var data_sender = JSON.stringify({"custID":7,"amount":100});
 
-      var updateBal = req.body.balance - req.body.amount;
-
+      //Call both parties' balance first then use it to update
+      //Person 1 
+      //req.body = {"custID":7};
       var config = {
         method: 'post',
-        url: 'https://u8fpqfk2d4.execute-api.ap-southeast-1.amazonaws.com/techtrek2020/accounts/update',
+        url: 'https://u8fpqfk2d4.execute-api.ap-southeast-1.amazonaws.com/techtrek2020/accounts/view',
         headers: { 
           'x-api-key': '1pigYzAdHBepN1i5E1ga2Jdug12i4Mu3Ph8PYp15', 
           'Content-Type': 'application/json'
         },
         data : {
-          "custID": req.body.custID,
-          "amount": updateBal
+          "custID": req.body.custID
+        } 
+      };
+
+      axios(config)
+      .then(function (response) {
+        console.log(JSON.stringify(response.data));
+
+        //Get the availBal from response data
+        var config = {
+          method: 'post',
+          url: 'https://u8fpqfk2d4.execute-api.ap-southeast-1.amazonaws.com/techtrek2020/accounts/update',
+          headers: { 
+            'x-api-key': '1pigYzAdHBepN1i5E1ga2Jdug12i4Mu3Ph8PYp15', 
+            'Content-Type': 'application/json'
+          },
+          data : {
+            "custID": req.body.custID,
+            "amount": response.data.availableBal - req.body.amount
+          }
+        };
+  
+        axios(config)
+        .then(function (response) {
+          console.log(JSON.stringify(response.data));
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+      //Person 2
+      //req.body = {"payeeID":9};
+
+      var config = {
+        method: 'post',
+        url: 'https://u8fpqfk2d4.execute-api.ap-southeast-1.amazonaws.com/techtrek2020/accounts/view',
+        headers: { 
+          'x-api-key': '1pigYzAdHBepN1i5E1ga2Jdug12i4Mu3Ph8PYp15', 
+          'Content-Type': 'application/json'
+        },
+        data : {
+          "custID": req.body.payeeID
         }
       };
 
       axios(config)
       .then(function (response) {
         console.log(JSON.stringify(response.data));
+
+        //Get the availBal from response data
+        var config = {
+          method: 'post',
+          url: 'https://u8fpqfk2d4.execute-api.ap-southeast-1.amazonaws.com/techtrek2020/accounts/update',
+          headers: { 
+            'x-api-key': '1pigYzAdHBepN1i5E1ga2Jdug12i4Mu3Ph8PYp15', 
+            'Content-Type': 'application/json'
+          },
+          data : {
+            "custID": req.body.payeeID,
+            "amount": response.data.availableBal - req.body.amount
+          }
+        };
+  
+        axios(config)
+        .then(function (response) {
+          console.log(JSON.stringify(response.data));
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
       })
       .catch(function (error) {
         console.log(error);
       });
-      //end of Update Sender's balance
-
-      //Update Recipient's balance
-      //var data_sender = JSON.stringify({"custID":7,"amount":100});
-
-      var config = {
-        method: 'post',
-        url: 'https://u8fpqfk2d4.execute-api.ap-southeast-1.amazonaws.com/techtrek2020/accounts/update',
-        headers: { 
-          'x-api-key': '1pigYzAdHBepN1i5E1ga2Jdug12i4Mu3Ph8PYp15', 
-          'Content-Type': 'application/json'
-        },
-        data : {
-          "payeeID": req.body.payeeID
-        }
-      };
-
-      axios(config)
-      .then(function (response) {
-        console.log(JSON.stringify(response.data));
-        console.log(" @@@@@ " + data.payeeID);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-      //end of Update Recipient's balance
-
     })
     .catch(function (error) {
       console.log(error);
     });
     
 });
+
+
+app.post('/api/updateCust', (req, res) =>{
+  //var data = JSON.stringify({"custID":9});
+
+  req.body = {"custID":7};
+
+  var config = {
+      method: 'post',
+      url: 'https://u8fpqfk2d4.execute-api.ap-southeast-1.amazonaws.com/techtrek2020/transaction/view',
+      headers: { 
+          'x-api-key': '1pigYzAdHBepN1i5E1ga2Jdug12i4Mu3Ph8PYp15', 
+          'Content-Type': 'application/json'
+      },
+      data : req.body
+      };
+
+      axios(config)
+      .then(function (response) {
+      console.log(JSON.stringify(response.data));
+      res.json(response.data)
+      })
+      .catch(function (error) {
+      console.log(error);
+      });
+  });
 
 
 app.use('/api/view', (req, res) =>{
