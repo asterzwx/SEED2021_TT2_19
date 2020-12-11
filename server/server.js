@@ -158,7 +158,7 @@ app.post('/api/updateCust', (req, res) =>{
           'x-api-key': '1pigYzAdHBepN1i5E1ga2Jdug12i4Mu3Ph8PYp15', 
           'Content-Type': 'application/json'
       },
-      data : req.body
+      data : req.body    
       };
 
       axios(config)
