@@ -152,7 +152,7 @@ app.post('/api/updateCust', (req, res) =>{
   req.body = {"custID":7};
 
   var config = {
-      method: 'post',
+      method: 'post', 
       url: 'https://u8fpqfk2d4.execute-api.ap-southeast-1.amazonaws.com/techtrek2020/transaction/view',
       headers: { 
           'x-api-key': '1pigYzAdHBepN1i5E1ga2Jdug12i4Mu3Ph8PYp15', 
